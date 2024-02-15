@@ -248,8 +248,8 @@ def main(args):
                   #print(bgr.shape)
                   print(target_file)
 
-                  if not os.path.exists('/'.join(target_file.split('\\')[:-1])):
-                    os.makedirs('/'.join(target_file.split('\\')[:-1]))
+                  if not os.path.exists('/'.join(target_file.split('/')[:-1])):
+                    os.makedirs('/'.join(target_file.split('/')[:-1]))
 
 
                   cv2.imwrite(target_file, bgr)
