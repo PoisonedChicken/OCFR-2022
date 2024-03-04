@@ -15,7 +15,7 @@ tf.disable_v2_behavior()
 import numpy as np
 from util import detect_face, face_preprocess, face_image
 import cv2
-from PIL import Image
+from PIL import Image, ImageChops 
 
 
 occlusion_types = ["lower_face","top_face","upper_face","vertical","eye"]
@@ -36,7 +36,7 @@ occlusions_combinations = {1:["lower_face"],
 
 
 def select_occlusion_type():
-    return np.random.choice([1,2,3,4,5,6,7,8,9,10,11]) #
+    return np.random.choice([1,2,3,4,5,6,7,8,9,10,11]) #PROTOCOLO
 
 def select_occlusions(occlusions_info):
     types = occlusions_combinations[select_occlusion_type()]
@@ -53,10 +53,10 @@ def to_rgb(img):
 
 
 def IOU(Reframe,GTframe):
-  x1 = Reframe[0];
-  y1 = Reframe[1];
-  width1 = Reframe[2]-Reframe[0];
-  height1 = Reframe[3]-Reframe[1];
+  x1 = Reframe[0]
+  y1 = Reframe[1]
+  width1 = Reframe[2]-Reframe[0]
+  height1 = Reframe[3]-Reframe[1]
 
   x2 = GTframe[0]
   y2 = GTframe[1]
@@ -153,16 +153,24 @@ def main(args):
                   a,b = _paths[-2], _paths[-1]
                   target_dir = os.path.join(args.output_dir, a)
                   target_dir2 = os.path.join(args.output_dir + "_u",a)
+                  target_dir3 = os.path.join(args.output_dir + "_mask",a)
+                  
                   if not os.path.exists(target_dir):
                     os.makedirs(target_dir)
                   if not os.path.exists(target_dir2):
                     os.makedirs(target_dir2)
+                  if not os.path.exists(target_dir3):
+                    os.makedirs(target_dir3)
                   target_file = os.path.join(target_dir, b)
                   target_file2 = os.path.join(target_dir2, b)
+                  target_file3 = os.path.join(target_dir3, b)
                   _minsize = minsize
                   
                   _landmark = None
                   bounding_boxes, points = detect_face.detect_face(img, _minsize, pnet, rnet, onet, threshold, factor)
+                  
+
+
                   nrof_faces = bounding_boxes.shape[0]
                   if nrof_faces>0:
                     det = bounding_boxes[:,0:4]
@@ -178,13 +186,20 @@ def main(args):
                     _landmark = points[:, bindex].reshape( (2,5) ).T
                     nrof[0]+=1
                   else:
+                    #no Face Detected
+
                     nrof[1]+=1
+                    print('No Faces detected in '+a+'/'+b)
+                    continue  
 
                   selected_occlusions = select_occlusions(occlusions_info)
                   warped_occlusion = None
-                  img2 = img
+                  
 
                   img = Image.fromarray(img)
+                  im2 = img.copy().convert('L').point( lambda p: 0 ).convert('1') #image to keep just the mask
+
+
                   for occlusion in selected_occlusions:
                       
                       warped_occlusion = None
@@ -235,14 +250,23 @@ def main(args):
                           
                       
                       warped_occlusion = Image.fromarray(warped_occlusion)
+
+                      im2 = ImageChops.add(im2,warped_occlusion.convert('L').point( lambda p: 255 if p > 0 else 0 ).convert('1'))
+
+
                       warped_occlusion= Image.alpha_composite(img.convert('RGBA'), warped_occlusion)
                       img = warped_occlusion#np.asarray()
+
+                      
                       #img = Image.fromarray(img)
                       #bgr = img[...,::-1]
                   
                   img = np.asarray(img.convert("RGB"))
+                  im2 = np.asarray(im2.convert("RGB"))
                   #
                   warped = face_preprocess.preprocess(img, bbox=_bbox, landmark = _landmark, image_size=args.image_size)
+                  warped_2 = face_preprocess.preprocess(im2, bbox=_bbox, landmark = _landmark, image_size=args.image_size)
+
                   bgr = warped[...,::-1]
                   original_bgr = img[...,::-1]
                   #print(bgr.shape)
@@ -254,6 +278,9 @@ def main(args):
 
                   cv2.imwrite(target_file, bgr)
                   cv2.imwrite(target_file2 , original_bgr)
+                  cv2.imwrite(target_file3 , warped_2[...,::-1])
+
+
                   oline = '%s\t%s\t%s\t%s\t%s\n' % (target_file, _bbox[0], _bbox[1], _bbox[2], _bbox[3])
                   text_file.write(oline)
                   target_dir = os.path.join(args.output_dir ,  a)
