@@ -36,7 +36,7 @@ occlusions_combinations = {1:["lower_face"],
 
 
 def select_occlusion_type():
-    return np.random.choice([1,2,3,4,5,6,7,8,9,10,11]) #PROTOCOLO
+    return np.random.choice([1]) #PROTOCOLO
 
 def select_occlusions(occlusions_info):
     types = occlusions_combinations[select_occlusion_type()]
@@ -124,13 +124,16 @@ def main(args):
           nrof = np.zeros( (5,), dtype=np.int32)
           for fimage in dataset:
               _bbox = None
-              print(fimage)
+              
+              #print(fimage)
               if nrof_images_total%100==0:
                 print("Processing %d, (%s)" % (nrof_images_total, nrof))
               nrof_images_total += 1
               #if nrof_images_total<950000:
               #  continue
-              image_path = fimage.image_path
+              image_path_2 =  r'{}'.format(fimage.image_path)
+              image_path = image_path_2.replace("\\","/")
+
               if not os.path.exists(image_path):
                 print('image not found (%s)'%image_path)
                 continue
@@ -149,11 +152,13 @@ def main(args):
                   if img.ndim == 2:
                       img = to_rgb(img)
                   img = img[:,:,0:3]
-                  _paths = fimage.image_path.split('/')
+                  _paths = image_path.split('/')
+                  
                   a,b = _paths[-2], _paths[-1]
-                  target_dir = os.path.join(args.output_dir, a)
-                  target_dir2 = os.path.join(args.output_dir + "_u",a)
-                  target_dir3 = os.path.join(args.output_dir + "_mask",a)
+
+                  target_dir = args.output_dir + '/' + a
+                  target_dir2 = args.output_dir + "_u" + '/' + a
+                  target_dir3 = args.output_dir + "_mask"+ '/' + a
                   
                   if not os.path.exists(target_dir):
                     os.makedirs(target_dir)
@@ -161,17 +166,28 @@ def main(args):
                     os.makedirs(target_dir2)
                   if not os.path.exists(target_dir3):
                     os.makedirs(target_dir3)
-                  target_file = os.path.join(target_dir, b)
-                  target_file2 = os.path.join(target_dir2, b)
-                  target_file3 = os.path.join(target_dir3, b)
+                  target_file = target_dir + '/' + b
+                  target_file2 = target_dir2 + '/' + b
+                  target_file3 = target_dir3 + '/' + b
                   _minsize = minsize
                   
                   _landmark = None
                   bounding_boxes, points = detect_face.detect_face(img, _minsize, pnet, rnet, onet, threshold, factor)
-                  
-
-
                   nrof_faces = bounding_boxes.shape[0]
+                  attempt = 1
+                  while not nrof_faces>0:
+                    #no Face Detected
+                    print('Attempt ', attempt)
+                    print('No face detected for '+a+' face '+b) 
+                    
+                    bounding_boxes, points = detect_face.detect_face(img, _minsize, pnet, rnet, onet, np.array(threshold) - attempt*np.array([.01,.015,.02]), factor)
+                    nrof_faces = bounding_boxes.shape[0]
+                    attempt += 1
+
+                    
+
+
+                  
                   if nrof_faces>0:
                     det = bounding_boxes[:,0:4]
                     img_size = np.asarray(img.shape)[0:2]
@@ -185,12 +201,7 @@ def main(args):
                     _bbox = bounding_boxes[bindex, 0:4]
                     _landmark = points[:, bindex].reshape( (2,5) ).T
                     nrof[0]+=1
-                  else:
-                    #no Face Detected
 
-                    nrof[1]+=1
-                    print('No Faces detected in '+a+'/'+b)
-                    continue  
 
                   selected_occlusions = select_occlusions(occlusions_info)
                   warped_occlusion = None
@@ -270,7 +281,7 @@ def main(args):
                   bgr = warped[...,::-1]
                   original_bgr = img[...,::-1]
                   #print(bgr.shape)
-                  print(target_file)
+                  #print(target_file)
 
                   if not os.path.exists('/'.join(target_file.split('/')[:-1])):
                     os.makedirs('/'.join(target_file.split('/')[:-1]))
@@ -283,12 +294,13 @@ def main(args):
 
                   oline = '%s\t%s\t%s\t%s\t%s\n' % (target_file, _bbox[0], _bbox[1], _bbox[2], _bbox[3])
                   text_file.write(oline)
-                  target_dir = os.path.join(args.output_dir ,  a)
+                  target_dir = os.path.join(args.output_dir ,  'Occ')
+                  target_dir = os.path.join(target_dir, a)
+
                   if not os.path.exists(target_dir):
-                          os.makedirs(target_dir)
+                    os.makedirs(target_dir)
                   target_file = os.path.join(target_dir, b)
-                  if (_bbox is None):
-                      print(target_file)
+
 
                 
 
