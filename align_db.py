@@ -156,7 +156,7 @@ def main(args):
                   
                   a,b = _paths[-2], _paths[-1]
 
-                  target_dir = args.output_dir + '/' + a
+                  target_dir = args.output_dir + '/OCC/' + a
                   target_dir2 = args.output_dir + "_u" + '/' + a
                   target_dir3 = args.output_dir + "_mask"+ '/' + a
                   
@@ -174,15 +174,7 @@ def main(args):
                   _landmark = None
                   bounding_boxes, points = detect_face.detect_face(img, _minsize, pnet, rnet, onet, threshold, factor)
                   nrof_faces = bounding_boxes.shape[0]
-                  attempt = 1
-                  while not nrof_faces>0:
-                    #no Face Detected
-                    print('Attempt ', attempt)
-                    print('No face detected for '+a+' face '+b) 
-                    
-                    bounding_boxes, points = detect_face.detect_face(img, _minsize, pnet, rnet, onet, np.array(threshold) - attempt*np.array([.01,.015,.02]), factor)
-                    nrof_faces = bounding_boxes.shape[0]
-                    attempt += 1
+
 
                     
 
@@ -201,7 +193,16 @@ def main(args):
                     _bbox = bounding_boxes[bindex, 0:4]
                     _landmark = points[:, bindex].reshape( (2,5) ).T
                     nrof[0]+=1
+                  else:
+                    #no Face Detected
+                    nrof[1]+=1
+                  
+                    #guardar imagem original
 
+                    cv2.imwrite(target_file, img[...,::-1])
+                    print('No Faces detected in '+a+'/'+b)
+
+                    continue  
 
                   selected_occlusions = select_occlusions(occlusions_info)
                   warped_occlusion = None
@@ -209,6 +210,9 @@ def main(args):
 
                   img = Image.fromarray(img)
                   im2 = img.copy().convert('L').point( lambda p: 0 ).convert('1') #image to keep just the mask
+                  
+                  
+
 
 
                   for occlusion in selected_occlusions:
@@ -283,8 +287,6 @@ def main(args):
                   #print(bgr.shape)
                   #print(target_file)
 
-                  if not os.path.exists('/'.join(target_file.split('/')[:-1])):
-                    os.makedirs('/'.join(target_file.split('/')[:-1]))
 
 
                   cv2.imwrite(target_file, bgr)
@@ -294,13 +296,7 @@ def main(args):
 
                   oline = '%s\t%s\t%s\t%s\t%s\n' % (target_file, _bbox[0], _bbox[1], _bbox[2], _bbox[3])
                   text_file.write(oline)
-                  target_dir = os.path.join(args.output_dir ,  'Occ')
-                  target_dir = os.path.join(target_dir, a)
-
-                  if not os.path.exists(target_dir):
-                    os.makedirs(target_dir)
-                  target_file = os.path.join(target_dir, b)
-
+                  
 
                 
 
