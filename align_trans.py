@@ -350,14 +350,14 @@ def warp_occlusion(src_img,
     ref_pts = np.float32(reference_pts)
     ref_pts_shp = ref_pts.shape
  
-    if ref_pts_shp[0] == 2:
-        ref_pts = ref_pts.T
+    #if ref_pts_shp[0] == 2:
+    #    ref_pts = ref_pts.T
     src_pts = np.float32(facial_pts)
     src_pts_shp = src_pts.shape
     
 
-    if src_pts_shp[0] == 2:
-        src_pts = src_pts.T
+    #if src_pts_shp[0] == 2:
+    #    src_pts = src_pts.T
 
 
     if src_pts.shape != ref_pts.shape:
