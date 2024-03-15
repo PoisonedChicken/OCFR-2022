@@ -1,12 +1,4 @@
-#!/bin/sh
-#​
-#SBATCH -p gpu_min12GB   # Global GPU partition (i.e., any GPU)​
-#SBATCH --qos gpu_min12GB       # QoS level
-#SBATCH -t 2-00:00               # Time(D-HH:MM)​
-#SBATCH --job-name ocluders   # Job name​
-#SBATCH -o slurm.%N.%j.out      # STDOUT​
-#SBATCH -e slurm.%N.%j.err      # STDERR​
-
-python /nas-ctm01/homes/rcmaia/OCFR/OCFR-2022/align_db.py --input-dir /nas-ctm01/datasets/public/BIOMETRICS/Face_Recognition/rfw/test_aligned/data/Indian/ --output-dir /nas-ctm01/datasets/public/BIOMETRICS/Face_Recognition/rfw_ocfr/Indian/
-
-python /nas-ctm01/homes/rcmaia/python_notifications.py --message 'Finished OCCLUDERS! - Indian'
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Indian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/Indian/ --lmk D:/Work/Datasets/RFW/txts/Indian/Indian_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Asian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/Asian/ --lmk D:/Work/Datasets/RFW/txts/Asian/Asian_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Caucasian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/Caucasian/ --lmk D:/Work/Datasets/RFW/txts/Caucasian/Caucasian_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/African/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/African/ --lmk D:/Work/Datasets/RFW/txts/African/African_lmk.txt
