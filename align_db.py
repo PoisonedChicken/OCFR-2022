@@ -61,7 +61,7 @@ def get_lmk_from_file(image,lmk_path):
                 return lmks
 
 def select_occlusion_type():
-    return np.random.choice([4]) #PROTOCOLO
+    return np.random.choice([1,2,4,6,7,10,11]) 
 
 def select_occlusions(occlusions_info):
     types = occlusions_combinations[select_occlusion_type()]
@@ -184,16 +184,23 @@ def main(args):
                   target_dir = args.output_dir + '/OCC/' + a
                   target_dir2 = args.output_dir + "_u" + '/' + a
                   target_dir3 = args.output_dir + "_mask"+ '/' + a
-                  
+                  target_dir4 = args.output_dir + "_mask_u"+ '/' + a
+                  target_dir5 = args.output_dir + "_occ_u"+ '/' + a
                   if not os.path.exists(target_dir):
                     os.makedirs(target_dir)
                   if not os.path.exists(target_dir2):
                     os.makedirs(target_dir2)
                   if not os.path.exists(target_dir3):
                     os.makedirs(target_dir3)
+                  if not os.path.exists(target_dir4):
+                    os.makedirs(target_dir4)
+                  if not os.path.exists(target_dir5):
+                    os.makedirs(target_dir5)
                   target_file = target_dir + '/' + b
                   target_file2 = target_dir2 + '/' + b
                   target_file3 = target_dir3 + '/' + b
+                  target_file4 = target_dir4 + '/' + b
+                  target_file5 = target_dir5 + '/' + b
                   _minsize = minsize
                   
                   _landmark = None
@@ -243,7 +250,8 @@ def main(args):
 
                   img = Image.fromarray(img)
                   im2 = img.copy().convert('L').point( lambda p: 0 ).convert('1') #image to keep just the mask
-                  
+                  im3 = Image.new("RGB", img.size, color="black") #image to keep just the mask in RGB 
+
                   
 
 
@@ -297,11 +305,15 @@ def main(args):
                       
                       warped_occlusion = Image.fromarray(warped_occlusion)
 
+
                       im2 = ImageChops.add(im2,warped_occlusion.convert('L').point( lambda p: 255 if p > 0 else 0 ).convert('1'))
 
 
-                      warped_occlusion= Image.alpha_composite(img.convert('RGBA'), warped_occlusion)
-                      img = warped_occlusion#np.asarray()
+                      im3 = Image.alpha_composite(im3.convert('RGBA'), warped_occlusion)
+
+
+                      img = Image.alpha_composite(img.convert('RGBA'), warped_occlusion)
+
 
                       
                       #img = Image.fromarray(img)
@@ -323,7 +335,8 @@ def main(args):
                   cv2.imwrite(target_file, bgr)
                   cv2.imwrite(target_file2 , original_bgr)
                   cv2.imwrite(target_file3 , warped_2[...,::-1])
-
+                  cv2.imwrite(target_file4 , im2[...,::-1])
+                  cv2.imwrite(target_file5 , np.asarray(im3.convert("RGB"))[...,::-1])
 
                   oline = '%s\t%s\t%s\t%s\t%s\n' % (target_file, _bbox[0], _bbox[1], _bbox[2], _bbox[3])
                   text_file.write(oline)
