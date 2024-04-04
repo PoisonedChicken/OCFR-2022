@@ -1,4 +1,4 @@
-python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Indian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/Indian/ --lmk D:/Work/Datasets/RFW/txts/Indian/Indian_lmk.txt
-python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Asian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/Asian/ --lmk D:/Work/Datasets/RFW/txts/Asian/Asian_lmk.txt
-python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Caucasian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/Caucasian/ --lmk D:/Work/Datasets/RFW/txts/Caucasian/Caucasian_lmk.txt
-python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/African/ --output-dir D:/Work/Datasets/RFW_occ_protocolo4/African/ --lmk D:/Work/Datasets/RFW/txts/African/African_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Indian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo1/Indian/ --lmk D:/Work/Datasets/RFW/txts/Indian/Indian_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Asian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo1/Asian/ --lmk D:/Work/Datasets/RFW/txts/Asian/Asian_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/Caucasian/ --output-dir D:/Work/Datasets/RFW_occ_protocolo1/Caucasian/ --lmk D:/Work/Datasets/RFW/txts/Caucasian/Caucasian_lmk.txt
+python align_db.py --input-dir D:/Work/Datasets/RFW/test/data/African/ --output-dir D:/Work/Datasets/RFW_occ_protocolo1/African/ --lmk D:/Work/Datasets/RFW/txts/African/African_lmk.txt

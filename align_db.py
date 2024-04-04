@@ -61,7 +61,7 @@ def get_lmk_from_file(image,lmk_path):
                 return lmks
 
 def select_occlusion_type():
-    return np.random.choice([1,2,4,6,7,10,11]) 
+    return np.random.choice([1,2,4]) 
 
 def select_occlusions(occlusions_info):
     types = occlusions_combinations[select_occlusion_type()]
